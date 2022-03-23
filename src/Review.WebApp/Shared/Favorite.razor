@@ -1,0 +1,24 @@
+﻿
+@inherits ProCompontentBase
+@inject GlobalConfig GlobalConfig;
+@inject NavigationManager Nav
+@implements IDisposable
+
+<div class="ml-10">
+    @foreach (var menu in GetFavoriteMenus())
+    {
+        <MTooltip Color="primary" Bottom>
+            <ActivatorContent>
+                <span @attributes="@context.Attrs" class="hover-pointer mr-8"  @onclick="()=>NavigateTo(menu)">
+                    <MIcon Size=24 Color="@(menu.Active?"primary":"neutral-lighten-3")">
+                        @menu.ParentIcon
+                    </MIcon>
+                </span>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@menu.FullTitle</span>
+            </ChildContent>
+        </MTooltip>
+    }
+
+</div>

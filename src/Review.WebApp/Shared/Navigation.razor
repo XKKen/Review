@@ -1,0 +1,92 @@
+﻿@using Review.WebApp.Global.Nav.Model
+
+
+<MNavigationDrawer Class="navigation" Width=300 MiniVariantWidth=80 Fixed App>
+
+    <div style="height:132px" class="block-center px-12">
+        <img height="48" width="48" class="hover-pointer" src="/img/mainLayout/logo.svg" />
+    </div>
+
+    <MList Nav Linkage Dense Class="pa-0">
+
+        @foreach (var nav in Navs)
+        {
+            if (nav.Children is null)
+            {
+                <MBorder Value=false Offset Width=4 Class="rounded-r-1" Border="Borders.Right">
+                    <MListItem Ripple=false Class="mb-4" ActiveClass="fill-lighten-1" Href="@nav.Href">
+                        <ItemContent>
+                            @if (context.Active)
+                            {
+                                RefreshRender(nav);
+                            }
+                            <MListItemIcon>
+                                <MIcon Color="@(context.Active?"primary":"neutral-lighten-2")" Size=20>@nav.Icon</MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <div style="margin-left:6.5px;" class="text-truncate white-space:nowrap @(context.Active?"text-subtitle":"text-body neutral-lighten-2--text")">nav.Title</div>
+                            </MListItemContent>
+                        </ItemContent>
+                    </MListItem>
+                </MBorder>
+            }
+            else
+            {
+                <MListGroup Group="@nav.Children.Select(n => n.Href).ToList()" Class="mb-4" PrependIcon="@nav.Icon" NoAction ActiveClass="primaryText" AppendIcon="M8.33398 10.3335L12.5007 14.5002L16.6673 10.3335H8.33398Z">
+                    <ActivatorContent>
+                        <MListItemContent>
+                            <div style="margin-left:6.5px;" class="text-truncate white-space:nowrap">@T(nav.Title)</div>
+                        </MListItemContent>
+                    </ActivatorContent>
+                    <ChildContent>
+                        @foreach (var navChild in nav.Children)
+                        {
+                            <MBorder Value=false Offset Width=4 Class="rounded-r-1" Border="Borders.Right">
+                                <MListItem Ripple=false ActiveClass="fill-lighten-1" Link Href="@navChild.Href">
+                                    <ItemContent>
+                                        @if (context.Active)
+                                        {
+                                            RefreshRender(navChild);
+                                        }
+                                        <MListItemContent>
+                                            <div class="text-truncate white-space:nowrap @(context.Active?"text-subtitle2":"text-btn neutral-lighten-2--text")">navChild.Title</div>
+                                        </MListItemContent>
+                                    </ItemContent>
+                                </MListItem>
+                            </MBorder>
+                        }
+                    </ChildContent>
+                </MListGroup>
+            }
+        }
+    </MList>
+
+</MNavigationDrawer>
+
+<MButton Small Fab Color="primary" Style="bottom:58px;z-index:7;position: fixed;left:280px;">
+    <MIcon Class="white--text">
+        "mdi-chevron-left"
+    </MIcon>
+</MButton>
+
+@code {
+    public List<NavModel> Navs { get; } = new()
+        {
+            new NavModel(1, "", "", "产品", null),
+            new NavModel(2, "", "", "经销商", null)
+        };
+        
+    public List<NavModel> SameLevelNavs { get; } = new();
+
+    public void RefreshRender(NavModel nav)
+    {
+        Active(nav);
+    }
+
+    public void Active(NavModel nav)
+    {
+        SameLevelNavs.ForEach(n => n.Active = false);
+        nav.Active = true;
+        if (nav.ParentId != 0) SameLevelNavs.First(n => n.Id == nav.ParentId).Active = true;
+    }
+}
